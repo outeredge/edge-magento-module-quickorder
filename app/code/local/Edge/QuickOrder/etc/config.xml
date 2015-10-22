@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Edge_QuickOrder>
+            <version>1.0.0</version>
+        </Edge_QuickOrder>
+    </modules>
+    <global>
+        <helpers>
+            <quickorder>
+                <class>Edge_QuickOrder_Helper</class>
+            </quickorder>
+        </helpers>
+    </global>
+</config>

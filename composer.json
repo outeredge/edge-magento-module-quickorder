@@ -1,0 +1,21 @@
+{
+    "name": "outeredge/edge-magento-module-quickorder",
+    "type": "magento-module",
+    "description": "Quick Order Module by outer/edge",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "outer/edge",
+            "email": "bruno@outeredgeuk.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "extra": {
+        "map": [
+            ["app/code/local/Edge/QuickOrder", "app/code/local/Edge/QuickOrder"],
+            ["app/etc/modules/Edge_QuickOrder.xml", "app/etc/modules/Edge_QuickOrder.xml"]
+        ]
+    }
+}
