@@ -7,9 +7,27 @@
     </modules>
     <global>
         <helpers>
-            <quickorder>
+            <edgequickorder>
                 <class>Edge_QuickOrder_Helper</class>
-            </quickorder>
+            </edgequickorder>
         </helpers>
     </global>
+    <frontend>
+        <routers>
+            <edgequickorder>
+                <use>standard</use>
+                <args>
+                    <module>Edge_QuickOrder</module>
+                    <frontName>edgequickorder</frontName>
+                </args>
+            </edgequickorder>
+        </routers>
+        <layout>
+            <updates>
+                <edgequickorder>
+                    <file>edge/quickorder.xml</file>
+                </edgequickorder>
+            </updates>
+        </layout>
+    </frontend>
 </config>
