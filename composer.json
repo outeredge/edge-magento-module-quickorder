@@ -16,7 +16,8 @@
         "map": [
             ["app/code/local/Edge/QuickOrder", "app/code/local/Edge/QuickOrder"],
             ["app/etc/modules/Edge_QuickOrder.xml", "app/etc/modules/Edge_QuickOrder.xml"],
-            ["app/design/frontend/base/default", "app/design/frontend/base/default"],
+            ["app/design/frontend/base/default/template/edge/quickorder/quickorder.phtml", "app/design/frontend/base/default/template/edge/quickorder/quickorder.phtml"],
+            ["app/design/frontend/base/default/layout/edge/quickorder.xml", "app/design/frontend/base/default/layout/edge/quickorder.xml"],
             ["js/edge/quickorder.js", "js/edge/quickorder.js"]
         ]
     }
