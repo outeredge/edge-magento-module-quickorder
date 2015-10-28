@@ -1,29 +1,20 @@
 <h2><?php echo $this->__('Quick Order'); ?></h2>
 
-<?php $catalogSearchHelper =  $this->helper('catalogsearch'); ?>
+<?php echo $this->__('Search by name or sku: '); ?>
+<input id="quickorder_search"  type="text" name="q">
 
-<form id="edge_quickorder" name="edge_quickorder" method='post' action="<?php echo $this->getUrl('edgequickorder/index/addToCard')?>" >
-    <div id="itemInput">
-        <?php echo $this->__('Name / Sku: '); ?>
+<form id="edge_quickorder" name="edge_quickorder" method='post' action="<?php echo $this->getUrl('edgequickorder/index/addToCart')?>" >
+    <div id="itemInput"></div>
 
-        <input id="quickorder_search" type="text" name="<?php echo $catalogSearchHelper->getQueryParamName() ?>" value="<?php echo $catalogSearchHelper->getEscapedQueryText() ?>" class="input-text" maxlength="<?php echo $catalogSearchHelper->getMaxQueryLength();?>" />
-
-        <?php echo $this->__('Qty: '); ?>
-        <input type="text" name="product[0][qty]">
-        <input type="button" value="Remove" onClick="addInput('itemRemove');">
-    </div>
-    <input type="button" value="Add Item" onClick="addInput('itemInput');">
-
-
-    <div id="search_autocomplete_quickorder" class="search_autocomplete_quickorder"></div>
+    <div id="search_autocomplete_quickorder" class="quickorder-search-autocomplete"></div>
     <script type="text/javascript">
     //<![CDATA[
-        var searchForm = new Varien.searchForm('edge_quickorder', 'quickorder_search', '<?php echo $this->__('Search entire store here...') ?>');
-        searchForm.initAutocomplete('edgequickorder/index/suggestCard', 'search_autocomplete_quickorder');
+        var searchFormQuickOrder = new Varien.searchFormQuickOrder('edge_quickorder', 'quickorder_search', '<?php echo $this->__('Search...') ?>');
+        searchFormQuickOrder.initAutocomplete('<?php echo $this->getUrl('edgequickorder/index/suggest')?>', 'search_autocomplete_quickorder');
     //]]>
     </script>
 
-    <input type='submit' name='Submit' value='Submit' />
+    <input type='submit' name='Submit' value='Add all to cart' />
 
 </form>
 

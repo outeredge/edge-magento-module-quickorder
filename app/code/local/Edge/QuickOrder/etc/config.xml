@@ -11,6 +11,11 @@
                 <class>Edge_QuickOrder_Helper</class>
             </edgequickorder>
         </helpers>
+        <blocks>
+            <edgequickorder>
+                <class>Edge_QuickOrder_Block</class>
+            </edgequickorder>
+        </blocks>
     </global>
     <frontend>
         <routers>

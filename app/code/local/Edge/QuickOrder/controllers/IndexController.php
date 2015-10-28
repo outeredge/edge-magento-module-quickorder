@@ -7,121 +7,89 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
         $this->loadLayout();
         $this->renderLayout();
     }
-    
-    public function suggestAction(){
 
-		$params = $this->getRequest()->getParams();
-		$str = strip_tags(trim($params['q']));
-		$query = mysql_escape_string($str);
-
-		$query = '%'.$query.'%';
-
-		if($query==''){ return; }
-
-		$data = array();
-		$isCollection = false;
-		$isSku = false;
-
-		$visibility = $this->getConfig('visibility_filter');
-		$visibility = explode(',',$visibility);
-
-		$sort_column = $this->getConfig('sort_column');
-		$limit =  $this->getConfig('number_result');
-
-		$types = Mage::helper('quickorder/protected')->getProductTypes();
-		$product = Mage::getModel('catalog/product')->loadByAttribute('sku',$str);
-
-
-
-
-		if($product){
-					$isSku = true;
-					$json = array();
-					if(!$this->isProductAllowed($product)){ return; }
-					$v = $product->getVisibility();
-					if($product->getStatus()==1 && in_array($v,$visibility)){
-						$imageUrl = $this->getImageUrl($product);
-						$json['value'] = $product->getSku();
-						$json['name'] = $product->getName();
-						$json['image'] = $imageUrl;
-						$json['is_sku'] = $isSku;
-						$data[] =  $json;
-						$this->getResponse()->setBody(Mage::helper('core')->jsonEncode($data));
-						return;
-					}
-		}
-
-		$collection = Mage::getModel('catalog/product')->getCollection()
-								->addStoreFilter()
-								->addFieldToFilter('name',array('like'=>$query))
-								->addAttributeToSelect(array('sku','name','small_image','is_salable','image','thumbnail'))
-								->addAttributeToFilter('visibility',array('in'=>$visibility))
-								->addAttributeToFilter('type_id',array('in'=>$types))
-								->addAttributeToSort($sort_column)
-								->addAttributeToFilter('status',1)
-								->setPageSize($limit);
-
-		if($collection->count()>0){
-			$isCollection = true;
-		}else{
-			$collection = Mage::getModel('catalog/product')->getCollection()
-								->addStoreFilter()
-								->addFieldToFilter('sku',array('like'=>$query))
-								->addAttributeToSelect(array('name','sku','small_image','image','is_salable','thumbnail'))
-								->addAttributeToFilter('visibility',array('in'=>$visibility))
-								->addAttributeToFilter('type_id',array('in'=>$types))
-								->addAttributeToFilter('status',1)
-								->addAttributeToSort($sort_column)
-								->setPageSize($limit);
-			$isSku = true;
-			$isCollection = true;
-		}
-		if($isCollection){
-
-			foreach($collection as $_product){
-
-					if(!$this->isProductAllowed($_product)){ continue; }
-					$imageUrl = $this->getImageUrl($_product);
-					$json = array();
-					$json['value'] = $_product->getSku();
-					$json['name'] = $_product->getName();
-					$json['image'] = $imageUrl;
-					$json['is_sku'] = $isSku;
-					$data[] =  $json;
-			}
-		}
-
-
-		$this->getResponse()->setBody(Mage::helper('core')->jsonEncode($data));
-
-	}
-
-
-    public function addToCardAction()
+    public function suggestAction()
     {
-        $data = $this->getRequest()->getPost();
+        if (!$this->getRequest()->getParam('q', false)) {
+            $this->getResponse()->setRedirect(Mage::getSingleton('core/url')->getBaseUrl());
+        }
 
-        if (!empty($data)) {
+        $this->getResponse()->setBody($this->getLayout()->createBlock('edgequickorder/autocomplete')->toHtml());
+    }
+
+    public function addToCartAction() {
+
+        if ($data = $this->getRequest()->getPost('product')) {
+            $cart   = Mage::getSingleton('checkout/cart');
 
             foreach ($data as $row) {
-                if (isset($row['sku']) && isset($row['qty'])) {
-                    $sku = $row['sku'];
-                    $qty = $row['qty'];
 
-                    $id = Mage::getModel('catalog/product')->getIdBySku($sku);
+                if (!isset($row['sku'])) {
+                    continue;
+                }
 
-                    if (empty($id)) {
-                        Mage::getSingleton('checkout/session')->addError("<strong>Product Not Added</strong><br />The SKU you entered ($sku) was not found.");
-                    } else {
-                        header('Location: /checkout/cart/add?product='.$id.'&qty='.$qty);
+                $productId = Mage::getModel('catalog/product')->getIdBySku($row['sku']);
+
+                if ($productId) {
+                    $product = Mage::getModel('catalog/product')
+                        ->setStoreId(Mage::app()->getStore()->getId())
+                        ->load($productId);
+
+                    $attributeName = [];
+                    $parent_id = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+
+                    if (!empty($parent_id)) {
+                            $parent_product = Mage::getModel('catalog/product')
+                                                   ->setStoreId(Mage::app()->getStore()->getId())
+                                                   ->load($parent_id);
+
+                            $productId = $parent_product->getId();
+                            $confAttributes = $parent_product->getTypeInstance(true)->getConfigurableAttributesAsArray($parent_product);
+
+                            foreach ($confAttributes as $conf) {
+                                if (isset($product[$conf['attribute_code']])) {
+                                    $attributeName[] = [$conf['attribute_id'] => $product[$conf['attribute_code']]];
+                                }
+                            }
                     }
 
+                    $params = ['cart'            => 'add',
+                               'product'         => $productId,
+                               'related_product' => '',
+                               'super_attribute' => $attributeName[0],
+                               'qty'             => !isset($row['qty']) ? 1: $row['qty']];
+
+                    try {
+
+                        $cart->addProduct($product, $params);
+                        if (!empty($params['related_product'])) {
+                            $cart->addProductsByIds(explode(',', $params['related_product']));
+                        }
+                        $cart->save();
+
+                        $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
+                        Mage::getSingleton('checkout/session')->addSuccess($message);
+                    }
+                    catch (Mage_Core_Exception $e) {
+                        if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
+                            Mage::getSingleton('checkout/session')->addNotice($e->getMessage());
+                        } else {
+                            $messages = array_unique(explode("\n", $e->getMessage()));
+                            foreach ($messages as $message) {
+                                Mage::getSingleton('checkout/session')->addError($message);
+                            }
+                        }
+                    }
+                    catch (Exception $e) {
+                        Mage::getSingleton('checkout/session')->addException($e, $this->__('Can not add item to shopping cart'));
+                    }
                 }
             }
 
-        }
-        return;
+           Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
 
+        }
+        $this->_redirect('checkout/cart');
     }
 
 }
