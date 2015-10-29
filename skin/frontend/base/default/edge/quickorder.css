@@ -41,3 +41,10 @@
 .quickorder .input-qty {
     width: 22px;
 }
+
+.quickorder-search-autocomplete { z-index:999; }
+.quickorder-search-autocomplete ul { border:1px solid #5c7989; background-color:#f9f5f0; }
+.quickorder-search-autocomplete li { text-align:left; border-bottom:1px solid #f4eee7; padding:2px 8px 1px 8px; cursor:pointer; }
+.quickorder-search-autocomplete li .amount { float:right; font-weight:bold; }
+.quickorder-search-autocomplete li.odd { background-color:#fffefb; }
+.quickorder-search-autocomplete li.selected { background-color:#f7e8dd; }
