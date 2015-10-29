@@ -19,7 +19,7 @@
             ["app/design/frontend/base/default/template/edge/quickorder/quickorder.phtml", "app/design/frontend/base/default/template/edge/quickorder/quickorder.phtml"],
             ["app/design/frontend/base/default/layout/edge/quickorder.xml", "app/design/frontend/base/default/layout/edge/quickorder.xml"],
             ["js/edge/quickorder.js", "js/edge/quickorder.js"],
-            ["skin/frontend/base/default/quickorder.css", "skin/frontend/base/default/quickorder.css"]
+            ["skin/frontend/base/default/edge/quickorder.css", "skin/frontend/base/default/edge/quickorder.css"]
         ]
     }
 }
