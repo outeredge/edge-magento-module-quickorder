@@ -39,18 +39,18 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                     $parent_id = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
 
                     if (!empty($parent_id)) {
-                            $parent_product = Mage::getModel('catalog/product')
-                                                   ->setStoreId(Mage::app()->getStore()->getId())
-                                                   ->load($parent_id);
+                        $parent_product = Mage::getModel('catalog/product')
+                                               ->setStoreId(Mage::app()->getStore()->getId())
+                                               ->load($parent_id);
 
-                            $productId = $parent_product->getId();
-                            $confAttributes = $parent_product->getTypeInstance(true)->getConfigurableAttributesAsArray($parent_product);
+                        $productId = $parent_product->getId();
+                        $confAttributes = $parent_product->getTypeInstance(true)->getConfigurableAttributesAsArray($parent_product);
 
-                            foreach ($confAttributes as $conf) {
-                                if (isset($product[$conf['attribute_code']])) {
-                                    $attributeName[] = [$conf['attribute_id'] => $product[$conf['attribute_code']]];
-                                }
+                        foreach ($confAttributes as $conf) {
+                            if (isset($product[$conf['attribute_code']])) {
+                                $attributeName[] = [$conf['attribute_id'] => $product[$conf['attribute_code']]];
                             }
+                        }
                     }
 
                     $params = ['cart'            => 'add',

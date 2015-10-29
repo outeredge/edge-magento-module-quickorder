@@ -5,6 +5,7 @@
     <edgequickorder_index_index>
         <reference name="head">
             <action method="addJs"><script>edge/quickorder.js</script></action>
+            <action method="addCss"><stylesheet>edge/quickorder.css</stylesheet></action>
 	</reference>
         <reference name="content">
             <block  type="core/template" name="edgequickorder" template="edge/quickorder/quickorder.phtml"/>

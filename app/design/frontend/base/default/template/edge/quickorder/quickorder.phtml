@@ -1,20 +1,22 @@
-<h2><?php echo $this->__('Quick Order'); ?></h2>
+<div class='quickorder'>
+    <h2><?php echo $this->__('Quick Order'); ?></h2>
 
-<?php echo $this->__('Search by name or sku: '); ?>
-<input id="quickorder_search"  type="text" name="q">
+    <?php echo $this->__('Search by name or sku: '); ?>
 
-<form id="edge_quickorder" name="edge_quickorder" method='post' action="<?php echo $this->getUrl('edgequickorder/index/addToCart')?>" >
-    <div id="itemInput"></div>
+    <input id="quickorder_search"  type="text" name="q" size="35"  maxlength="128">
 
-    <div id="search_autocomplete_quickorder" class="quickorder-search-autocomplete"></div>
-    <script type="text/javascript">
-    //<![CDATA[
-        var searchFormQuickOrder = new Varien.searchFormQuickOrder('edge_quickorder', 'quickorder_search', '<?php echo $this->__('Search...') ?>');
-        searchFormQuickOrder.initAutocomplete('<?php echo $this->getUrl('edgequickorder/index/suggest')?>', 'search_autocomplete_quickorder');
-    //]]>
-    </script>
+    <form id="edge_quickorder" name="edge_quickorder" method='post' action="<?php echo $this->getUrl('edgequickorder/index/addToCart')?>" >
+        <div id="itemInput"></div>
 
-    <input type='submit' name='Submit' value='Add all to cart' />
+        <div id="search_autocomplete_quickorder" class="quickorder-search-autocomplete"></div>
+        <script type="text/javascript">
+        //<![CDATA[
+            var searchFormQuickOrder = new Varien.searchFormQuickOrder('edge_quickorder', 'quickorder_search', '<?php echo $this->__('Search...') ?>');
+            searchFormQuickOrder.initAutocomplete('<?php echo $this->getUrl('edgequickorder/index/suggest')?>', 'search_autocomplete_quickorder');
+        //]]>
+        </script>
+        <input class='button' type='submit' name='Submit' value='Add all to cart' />
+    </form>
 
-</form>
+</div>
 

@@ -5,9 +5,9 @@ function addInput(sku) {
     var newdiv = document.createElement('div');
     var inputId = "input" + counter;
     newdiv.setAttribute("id", inputId);
-    newdiv.innerHTML = "Name / Sku: <input type='text' name='product[" + counter + "][sku]' value='" + sku + "'>\n\
-                        Qty: <input type='text' name='product[" + counter + "][qty]'>\n\
-                        <input type='button' value='Remove' onClick='removeInput(" + inputId + ");'>";
+    newdiv.innerHTML = "Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + sku + "'>\n\
+                        Qty: <input type='text' class='input-qty' name='product[" + counter + "][qty]'>\n\
+                        <input class='button-remove' type='button' value='Remove' onClick='removeInput(" + inputId + ");'>";
     document.getElementById(divName).appendChild(newdiv);
     counter++;
 }
