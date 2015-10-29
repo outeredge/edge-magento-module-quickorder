@@ -60,12 +60,24 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                                'qty'             => !isset($row['qty']) ? 1: $row['qty']];
 
                     try {
+                        $this->getRequest()->setparam('qty', $params['qty']);
 
                         $cart->addProduct($product, $params);
                         if (!empty($params['related_product'])) {
                             $cart->addProductsByIds(explode(',', $params['related_product']));
                         }
                         $cart->save();
+
+                        Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+
+                        $stockReturn = Mage::dispatchEvent('checkout_cart_add_product_complete',
+                            array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
+                        );
+                        $stockMessage = $stockReturn->getResponse()->getBody();
+
+                        if (!empty($stockMessage)) {
+                            Mage::getSingleton('checkout/session')->addNotice($stockMessage);
+                        }
 
                         $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
                         Mage::getSingleton('checkout/session')->addSuccess($message);
