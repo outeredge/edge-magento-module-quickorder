@@ -1,7 +1,6 @@
 var counter = 0;
 
 function addInput(data) {
-    console.log(data);
     var divName = 'itemInput';
     var newdiv = document.createElement('div');
     var inputId = "input" + counter;
@@ -92,7 +91,6 @@ Varien.searchFormQuickOrder.prototype = {
     },
 
     _selectAutocompleteItem : function(element){
-        document.getElementById("quickorder_search").value = 'Search...';
         if(element.title){
             formId = addInput(JSON.parse(element.title));
         }
