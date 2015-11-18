@@ -31,11 +31,11 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li title="' . $this->escapeHtml($item['value']) . '" class="' . $item['row_class'] . '">';
+            $html .=  '<li title="' . json_encode($item['options']). '" class="' . $item['row_class'] . '">';
             $html .=  '<div><table><tbody><tr>';
             $html .=  '<td><img src="' . $item['image'] . '"  width="60" height="57"></td>';
             $html .=  '<td><strong>"' . $this->escapeHtml($item['name']) . '"</strong>'
-                . '<br> SKU: "' . $this->escapeHtml($item['value']) . ' "' . $this->escapeHtml($item['option']) . '</td>';
+                . '<br> SKU: "' . $this->escapeHtml($item['value']) . '"</td>';
             $html .=  '</tr></tbody></table></div>';
             $html .=  '</li>';
         }
@@ -58,33 +58,29 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
         if (!$this->_suggestData) {
             $collection = $this->getSuggestCollection($query);
 
-            $option = '';
             $data = array();
             foreach ($collection as $item) {
+                $options = $activeOptions = $array = '';
 
                 if ($item->getStockItem()->getIsInStock()) {
 
-                    $parent_id = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($item->getId());
+                    if ($item->getRequiredOptions() && $item->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
 
-                    if (!empty($parent_id)) {
-                        $product = Mage::getModel('catalog/product')
-                            ->setStoreId(Mage::app()->getStore()->getId())
-                            ->load($item->getId());
+                        $configOpt = $item->getTypeInstance(true)->getConfigurableOptions($item);
 
-                        $parent_product = Mage::getModel('catalog/product')
-                            ->setStoreId(Mage::app()->getStore()->getId())
-                            ->load($parent_id);
+                        foreach (reset($configOpt) as $config) {
+                            $activeOptions[] = $config['option_title'];
+                        }
 
-                        $confAttributes = $parent_product->getTypeInstance(true)->getConfigurableAttributesAsArray($parent_product);
+                        $confAttributes = $item->getTypeInstance(true)->getConfigurableAttributesAsArray($item);
 
                         foreach ($confAttributes as $conf) {
-                            if (isset($product[$conf['attribute_code']])) {
-                                foreach ($conf['values'] as $value) {
-                                    if ($value['value_index'] == $product[$conf['attribute_code']]) {
-                                        $option = $value['default_label'] . '  ';
-                                    }
+                            foreach ($conf['values'] as $option) {
+                                if (in_array($option['store_label'], $activeOptions)) {
+                                   $array[$option['value_index']] = $option['store_label'];
                                 }
                             }
+                            $options[$conf['attribute_id']] = $array;
                         }
                     }
 
@@ -92,7 +88,8 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                     $_data = array(
                         'value'     => $item->getSku(),
                         'name'      => $item->getName(),
-                        'option'    => $option,
+                        'options'   => ["sku" => $item->getSku(),
+                                        "opt" => $options],
                         'image'     => $imageUrl
                     );
                     $data[] = $_data;
@@ -103,14 +100,16 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
         return $this->_suggestData;
     }
 
-
     protected function getSuggestCollection($query)
     {
+        $productAdapter = new Mage_Catalog_Model_Convert_Adapter_Product();
+
         $collection = Mage::getModel('catalog/product')->getCollection()
             ->addStoreFilter(Mage::app()->getStore()->getId())
             ->addFieldToFilter('name',array('like'=> $query))
             ->addAttributeToSelect(array('sku','name','small_image','is_salable','image','thumbnail'))
-            ->addAttributeToFilter('type_id',array('in'=> 'simple'))
+            ->addAttributeToFilter('visibility',array('in'=> Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH))
+            ->addAttributeToFilter('type_id',array('in'=> $productAdapter->getProductTypes()))
             ->addAttributeToFilter('status', 1)
             ->setPageSize(10);
 
@@ -120,8 +119,9 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                 ->addStoreFilter(Mage::app()->getStore()->getId())
                 ->addFieldToFilter('sku',array('like'=>$query))
                 ->addAttributeToSelect(array('name','sku','small_image','image','is_salable','thumbnail'))
+                ->addAttributeToFilter('visibility',array('in'=> Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH))
                 ->addAttributeToFilter('status', 1)
-                ->addAttributeToFilter('type_id',array('in'=> 'simple'))
+                ->addAttributeToFilter('type_id',array('in'=> $productAdapter->getProductTypes()))
                 ->setPageSize(10);
 	}
 

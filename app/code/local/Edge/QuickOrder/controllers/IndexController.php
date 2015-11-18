@@ -4,6 +4,10 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
 {
     public function indexAction()
     {
+        if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+            Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::getUrl('customer/account'));
+        }
+
         $this->loadLayout();
         $this->renderLayout();
     }
@@ -22,53 +26,37 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
         if ($data = $this->getRequest()->getPost('product')) {
             $cart   = Mage::getSingleton('checkout/cart');
 
-            foreach ($data as $row) {
+            try {
+                foreach ($data as $row) {
 
-                if (!isset($row['sku'])) {
-                    continue;
-                }
-
-                $productId = Mage::getModel('catalog/product')->getIdBySku($row['sku']);
-
-                if ($productId) {
-                    $product = Mage::getModel('catalog/product')
-                        ->setStoreId(Mage::app()->getStore()->getId())
-                        ->load($productId);
-
-                    $attributeName = [];
-                    $parent_id = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-
-                    if (!empty($parent_id)) {
-                        $parent_product = Mage::getModel('catalog/product')
-                                               ->setStoreId(Mage::app()->getStore()->getId())
-                                               ->load($parent_id);
-
-                        $productId = $parent_product->getId();
-                        $confAttributes = $parent_product->getTypeInstance(true)->getConfigurableAttributesAsArray($parent_product);
-
-                        foreach ($confAttributes as $conf) {
-                            if (isset($product[$conf['attribute_code']])) {
-                                $attributeName[] = [$conf['attribute_id'] => $product[$conf['attribute_code']]];
-                            }
-                        }
+                    if (!isset($row['sku'])) {
+                        continue;
                     }
 
-                    $params = ['cart'            => 'add',
-                               'product'         => $productId,
-                               'related_product' => '',
-                               'super_attribute' => $attributeName[0],
-                               'qty'             => !isset($row['qty']) ? 1: $row['qty']];
+                    $productId = Mage::getModel('catalog/product')->getIdBySku($row['sku']);
 
-                    try {
+                    if ($productId) {
+                        $product = Mage::getModel('catalog/product')
+                            ->setStoreId(Mage::app()->getStore()->getId())
+                            ->load($productId);
+
+                        $attributeName = [];
+                        if (!empty($row['super_attribute'])) {
+                            $attributeName = [key($row['super_attribute']) => reset($row['super_attribute'])];
+                        }
+
+                        $params = ['cart'            => 'add',
+                                   'product'         => $productId,
+                                   'related_product' => '',
+                                   'super_attribute' => $attributeName,
+                                   'qty'             => !isset($row['qty']) ? 1: $row['qty']];
+
                         $this->getRequest()->setparam('qty', $params['qty']);
 
                         $cart->addProduct($product, $params);
                         if (!empty($params['related_product'])) {
                             $cart->addProductsByIds(explode(',', $params['related_product']));
                         }
-                        $cart->save();
-
-                        Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
 
                         $stockReturn = Mage::dispatchEvent('checkout_cart_add_product_complete',
                             array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
@@ -82,26 +70,27 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                         $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
                         Mage::getSingleton('checkout/session')->addSuccess($message);
                     }
-                    catch (Mage_Core_Exception $e) {
-                        if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
-                            Mage::getSingleton('checkout/session')->addNotice($e->getMessage());
-                        } else {
-                            $messages = array_unique(explode("\n", $e->getMessage()));
-                            foreach ($messages as $message) {
-                                Mage::getSingleton('checkout/session')->addError($message);
-                            }
-                        }
-                    }
-                    catch (Exception $e) {
-                        Mage::getSingleton('checkout/session')->addException($e, $this->__('Can not add item to shopping cart'));
+                }
+
+                $cart->save();
+                Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+
+            }
+            catch (Mage_Core_Exception $e) {
+                if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
+                    Mage::getSingleton('checkout/session')->addNotice($e->getMessage());
+                } else {
+                    $messages = array_unique(explode("\n", $e->getMessage()));
+                    foreach ($messages as $message) {
+                        Mage::getSingleton('checkout/session')->addError($message);
                     }
                 }
             }
-
-           Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
+            catch (Exception $e) {
+                Mage::getSingleton('checkout/session')->addException($e, $this->__('Can not add item to shopping cart'));
+            }
         }
+
         $this->_redirect('checkout/cart');
     }
-
 }
