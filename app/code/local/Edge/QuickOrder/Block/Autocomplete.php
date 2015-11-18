@@ -31,7 +31,7 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                 $item['row_class'] .= ' last';
             }
 
-            $html .=  '<li title="' . json_encode($item['options']). '" class="' . $item['row_class'] . '">';
+            $html .=  '<li title=' . json_encode($item['options']). ' class="' . $item['row_class'] . '">';
             $html .=  '<div><table><tbody><tr>';
             $html .=  '<td><img src="' . $item['image'] . '"  width="60" height="57"></td>';
             $html .=  '<td><strong>"' . $this->escapeHtml($item['name']) . '"</strong>'
