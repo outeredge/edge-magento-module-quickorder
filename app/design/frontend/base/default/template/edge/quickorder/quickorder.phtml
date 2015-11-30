@@ -1,6 +1,8 @@
 <div class='quickorder'>
     <h2><?php echo $this->__('Quick Order'); ?></h2>
 
+    <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('quick-order')->toHtml(); ?>
+
     <?php echo $this->__('Search by name or sku: '); ?>
 
     <input id="quickorder_search"  type="text" name="q" size="35"  maxlength="128">
