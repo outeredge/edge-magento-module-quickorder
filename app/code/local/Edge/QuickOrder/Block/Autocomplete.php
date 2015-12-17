@@ -78,6 +78,7 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                         $confAttributes = $item->getTypeInstance(true)->getConfigurableAttributesAsArray($item);
 
                         foreach ($confAttributes as $conf) {
+                            $array = '';
                             foreach ($conf['values'] as $option) {
                                 if (in_array($option['store_label'], $activeOptions)) {
                                    $array[$option['value_index']] = $option['store_label'];

@@ -42,7 +42,9 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
 
                         $attributeName = [];
                         if (!empty($row['super_attribute'])) {
-                            $attributeName = [key($row['super_attribute']) => reset($row['super_attribute'])];
+                            foreach ($row['super_attribute'] as $key => $superAtt) {
+                                $attributeName += [$key => $superAtt];
+                            }
                         }
 
                         $params = ['cart'            => 'add',

@@ -9,13 +9,15 @@ function addInput(data) {
     var html = "Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + data.sku + "'>\n\
                         Qty: <input type='text' class='input-qty' name='product[" + counter + "][qty]'>";
 
-    if (data.opt[Object.keys(data.opt)[0]]) {
-        var options = data.opt[Object.keys(data.opt)[0]];
-        html += "<select name='product[" + counter + "][super_attribute][" + Object.keys(data.opt)[0] + "]'>";
-            for (var row in options) {
-            html += "<option value="+ row +" >"+options[row]+"</option>";
+    for (var optionRow in data.opt) {
+        if (data.opt) {
+            var options = data.opt[optionRow];
+            html += "<select name='product[" + counter + "][super_attribute][" + optionRow + "]'>";
+                for (var row in options) {
+                html += "<option value="+ row +" >"+options[row]+"</option>";
+            }
+            html += "</select>";
         }
-        html += "</select>";
     }
 
     html += "<input class='button-remove' type='button' value='Remove' onClick='removeInput(" + inputId + ");'>";
