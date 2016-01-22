@@ -48,3 +48,20 @@
 .quickorder-search-autocomplete li .amount { float:right; font-weight:bold; }
 .quickorder-search-autocomplete li.odd { background-color:#fffefb; }
 .quickorder-search-autocomplete li.selected { background-color:#f7e8dd; }
+
+.extra_delivery_quick_order {
+    padding: 10px;
+    display: table;
+}
+
+.extra_delivery_quick_order span {
+    font-size: 10px;
+    padding: 2px;
+    float: left;
+}
+
+.extra_delivery_quick_order input {
+    margin: 3px;
+    width: 15px;
+    float: left;
+}

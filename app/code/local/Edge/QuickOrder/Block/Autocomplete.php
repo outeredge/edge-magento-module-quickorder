@@ -34,13 +34,12 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
             $options = json_encode($item['options']);
             $options = str_replace(' ', '&#32;', $options);
 
-            $html .=  '<li title='.$options.' class="' . $item['row_class'] . '">';
-            $html .=  '<div><table><tbody><tr>';
-            $html .=  '<td><img src="' . $item['image'] . '"  width="60" height="57"></td>';
-            $html .=  '<td><strong>"' . $this->escapeHtml($item['name']) . '"</strong>'
-                . '<br> SKU: "' . $this->escapeHtml($item['value']) . '"</td>';
-            $html .=  '</tr></tbody></table></div>';
-            $html .=  '</li>';
+            $html .=  '<li title='.$options.' class="' . $item['row_class'] . '">'
+                  .   '<div><table><tbody><tr>'
+                  .   '<td><img src="' . $item['image'] . '"  width="60" height="57"></td>'
+                  .   '<td><strong>"' . $this->escapeHtml($item['name']) . '"</strong>'
+                  .   '<br> SKU: "' . $this->escapeHtml($item['value']) . '"</td>'
+                  .   '</tr></tbody></table></div></li>';
         }
 
         $html.= '</ul>';
@@ -50,9 +49,11 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
 
     protected function getSuggestData()
     {
-        $params = $this->getRequest()->getParams();
-        $string = strip_tags(trim($params['q']));
-        $query  = '%'. ($string) .'%';
+        $params  = $this->getRequest()->getParams();
+        $string  = strip_tags(trim($params['q']));
+        $query   = '%'. ($string) .'%';
+        $storeId = Mage::app()->getStore()->getId();
+        $extra   = false;
 
         if ($query == '') {
             return;
@@ -88,12 +89,20 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                         }
                     }
 
+                    $extraDeliveryCharges = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getId(), 'extra_delivery_charges', $storeId);
+                    $tcForExtraDelivery   = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getId(), 'tc_for_extra_delivery', $storeId);
+                    if (!empty($extraDeliveryCharges) && !empty($tcForExtraDelivery)) {
+                        $extra = ['extra_delivery_charges' => $extraDeliveryCharges,
+                                  'tc_for_extra_delivery'  => $tcForExtraDelivery];
+                    }
+
                     $imageUrl = $this->getImageUrl($item);
                     $_data = array(
                         'value'     => $item->getSku(),
                         'name'      => $item->getName(),
-                        'options'   => ["sku" => $item->getSku(),
-                                        "opt" => $options],
+                        'options'   => ["sku"   => $item->getSku(),
+                                        "opt"   => $options,
+                                        "extra" => $extra],
                         'image'     => $imageUrl
                     );
                     $data[] = $_data;

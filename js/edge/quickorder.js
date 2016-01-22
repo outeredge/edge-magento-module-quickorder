@@ -2,12 +2,12 @@ var counter = 0;
 
 function addInput(data) {
     var divName = 'itemInput';
-    var newdiv = document.createElement('div');
+    var newdiv  = document.createElement('div');
     var inputId = "input" + counter;
 
     newdiv.setAttribute("id", inputId);
-    var html = "Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + data.sku + "'>\n\
-                        Qty: <input type='text' class='input-qty' name='product[" + counter + "][qty]'>";
+    var html = "Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + data.sku + "'>\
+                Qty: <input type='text' class='input-qty' name='product[" + counter + "][qty]'>";
 
     for (var optionRow in data.opt) {
         if (data.opt) {
@@ -21,6 +21,17 @@ function addInput(data) {
     }
 
     html += "<input class='button-remove' type='button' value='Remove' onClick='removeInput(" + inputId + ");'>";
+
+    if (data.extra) {
+        html += "<div class='extra_delivery_quick_order'>\
+                    <div><span>"+data.extra.extra_delivery_charges+" "+Translator.translate('Terms & Conditions').stripTags()+"</span></div>\
+                    <div class='green-txt'>\n\
+                        <input type='checkbox' class='extra_delivery_checkbox'>\n\
+                        <span>"+data.extra.tc_for_extra_delivery+"</span>\n\
+                    </div>\
+                </div>";
+    }
+
     document.getElementById(divName).appendChild(newdiv);
     newdiv.innerHTML = html;
     counter++;
@@ -46,7 +57,18 @@ Varien.searchFormQuickOrder.prototype = {
         this.blur();
     },
 
-    submit : function(event){
+    submit : function(event) {
+        $extra = document.getElementsByClassName('extra_delivery_checkbox');
+        if ($extra.length > 0) {
+            for (var i = 0; i < $extra.length; ++i) {
+                if (!$extra[i].checked) {
+                    alert(Translator.translate('Please accept Terms & Conditions').stripTags());
+                    Event.stop(event);
+                    return false;
+                }
+            }
+        }
+
         if (this.field.value == this.emptyText || this.field.value == ''){
             Event.stop(event);
             return false;
