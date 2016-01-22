@@ -24,7 +24,7 @@ function addInput(data) {
 
     if (data.extra) {
         html += "<div class='extra_delivery_quick_order'>\
-                    <div><span>"+data.extra.extra_delivery_charges+" "+Translator.translate('Terms & Conditions').stripTags()+"</span></div>\
+                    <div><span>"+data.extra.extra_delivery_charges+" <a href="+data.extra.url_tc_extra_delivery+" target='_blank'>"+Translator.translate('Terms & Conditions').stripTags()+"</a></span></div>\
                     <div class='green-txt'>\n\
                         <input type='checkbox' class='extra_delivery_checkbox'>\n\
                         <span>"+data.extra.tc_for_extra_delivery+"</span>\n\

@@ -60,6 +60,10 @@
     float: left;
 }
 
+.extra_delivery_quick_order span a {
+    font-weight: bold;
+}
+
 .extra_delivery_quick_order input {
     margin: 3px;
     width: 15px;

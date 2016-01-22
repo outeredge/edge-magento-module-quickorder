@@ -93,7 +93,8 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                     $tcForExtraDelivery   = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getId(), 'tc_for_extra_delivery', $storeId);
                     if (!empty($extraDeliveryCharges) && !empty($tcForExtraDelivery)) {
                         $extra = ['extra_delivery_charges' => $extraDeliveryCharges,
-                                  'tc_for_extra_delivery'  => $tcForExtraDelivery];
+                                  'tc_for_extra_delivery'  => $tcForExtraDelivery,
+                                  'url_tc_extra_delivery'  => $this->getUrl('terms')];
                     }
 
                     $imageUrl = $this->getImageUrl($item);
