@@ -69,3 +69,19 @@
     width: 15px;
     float: left;
 }
+
+.quickorder-search-autocomplete .availability-bubble{
+    width: 25px;
+    height: 25px;
+    margin: 3px;
+}
+
+.quickorder-search-autocomplete .availability-bubble.low-stock:before{
+    content: '!';
+    width: 25px;
+    line-height: 25px;
+    text-align: center;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+}
