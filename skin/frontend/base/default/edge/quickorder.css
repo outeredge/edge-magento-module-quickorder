@@ -70,13 +70,13 @@
     float: left;
 }
 
-.quickorder-search-autocomplete .availability-bubble{
+#edge_quickorder .availability-bubble{
     width: 25px;
     height: 25px;
-    margin: 3px;
+    margin: 10px 10px 0px 0px;
 }
 
-.quickorder-search-autocomplete .availability-bubble.low-stock:before{
+#edge_quickorder .availability-bubble.low-stock:before{
     content: '!';
     width: 25px;
     line-height: 25px;

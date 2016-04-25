@@ -6,7 +6,8 @@ function addInput(data) {
     var inputId = "input" + counter;
 
     newdiv.setAttribute("id", inputId);
-    var html = "Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + data.sku + "'>\
+    var html = "<span class='availability-bubble "+ data.stock +"'></span>\
+                Sku: <input type='text' class='input-sku' name='product[" + counter + "][sku]' value='" + data.sku + "'>\
                 Qty: <input type='text' class='input-qty' name='product[" + counter + "][qty]'>";
 
     for (var optionRow in data.opt) {

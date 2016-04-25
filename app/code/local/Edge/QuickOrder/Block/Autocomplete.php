@@ -38,8 +38,7 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                   .   '<div><table><tbody><tr>'
                   .   '<td><img src="' . $item['image'] . '"  width="60" height="57"></td>'
                   .   '<td><strong>"' . $this->escapeHtml($item['name']) . '"</strong>'
-                  .   '<br> SKU: '.$this->escapeHtml($item['value']).' '
-                  .   '<div class="availability-bubble '.$item['stock'].'"></div></td>'
+                  .   '<br> SKU: '.$this->escapeHtml($item['value']).'</td>'
                   .   '</tr></tbody></table></div></li>';
         }
 
@@ -126,8 +125,8 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                         'name'      => $item->getName(),
                         'options'   => ["sku"   => $item->getSku(),
                                         "opt"   => $options,
-                                        "extra" => $extra],
-                        'stock'     => $stock,
+                                        "extra" => $extra,
+                                        "stock" => $stock],
                         'image'     => $imageUrl
                     );
                     $data[] = $_data;
