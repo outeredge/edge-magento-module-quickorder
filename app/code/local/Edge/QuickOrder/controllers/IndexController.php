@@ -60,6 +60,10 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                             $cart->addProductsByIds(explode(',', $params['related_product']));
                         }
 
+                        $cart->save();
+                        Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+                        Mage::getSingleton('checkout/session')->setCartInsertedItem($product->getId());
+
                         $stockReturn = Mage::dispatchEvent('checkout_cart_add_product_complete',
                             array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
                         );
@@ -67,16 +71,12 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
 
                         if (!empty($stockMessage)) {
                             Mage::getSingleton('checkout/session')->addNotice($stockMessage);
+                        } else {
+                            $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
+                            Mage::getSingleton('checkout/session')->addSuccess($message);
                         }
-
-                        $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
-                        Mage::getSingleton('checkout/session')->addSuccess($message);
                     }
                 }
-
-                $cart->save();
-                Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
             }
             catch (Mage_Core_Exception $e) {
                 if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
