@@ -90,26 +90,7 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                     }
 
                     //Stock Lights
-                    if ($item->isAvailable()) {
-                        $_product = Mage::getModel('catalog/product')->load($item->getId());
-                        $lowStockCutoff = (int)Mage::getStoreConfig('cataloginventory/options/stock_threshold_qty');
-                        if ($_product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
-                            $stockQty = 0;
-                            foreach ($_product->getTypeInstance(true)->getUsedProducts(null, $_product) as $simple) {
-                                $stockQty += $simple->getStockItem()->getQty();
-                            }
-                        } else {
-                            $stockQty = $_product->getStockItem()->getQty();
-                        }
-
-                        if ($stockQty < $lowStockCutoff) {
-                             $stock = 'low-stock';
-                        } else {
-                            $stock = 'in-stock';
-                        }
-                    } else {
-                        $stock = 'out-of-stock';
-                    }
+                    $stockInfo = Mage::helper('edgequickorder')->checkProductStock($item);
 
                     $extraDeliveryCharges = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getId(), 'extra_delivery_charges', $storeId);
                     $tcForExtraDelivery   = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getId(), 'tc_for_extra_delivery', $storeId);
@@ -126,7 +107,8 @@ class Edge_QuickOrder_Block_Autocomplete extends Mage_Core_Block_Abstract
                         'options'   => ["sku"   => $item->getSku(),
                                         "opt"   => $options,
                                         "extra" => $extra,
-                                        "stock" => $stock],
+                                        "stock" => $stockInfo['stockLight']
+                        ],
                         'image'     => $imageUrl
                     );
                     $data[] = $_data;
