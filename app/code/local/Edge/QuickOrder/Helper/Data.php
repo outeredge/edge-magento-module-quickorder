@@ -21,7 +21,8 @@ class Edge_QuickOrder_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } else {
         //Simple product
-            $stockQty = $_product->getStockItem()->getQty();
+            $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($_product);
+            $stockQty = $stock->getQty();
         }
         //Bundle product
         if ($_product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {

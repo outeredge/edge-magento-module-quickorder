@@ -60,23 +60,34 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                             $cart->addProductsByIds(explode(',', $params['related_product']));
                         }
 
-                        $cart->save();
-                        Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-                        Mage::getSingleton('checkout/session')->setCartInsertedItem($product->getId());
-
-                        $stockReturn = Mage::dispatchEvent('checkout_cart_add_product_complete',
-                            array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
-                        );
-                        $stockMessage = $stockReturn->getResponse()->getBody();
-
-                        if (!empty($stockMessage)) {
-                            Mage::getSingleton('checkout/session')->addNotice($stockMessage);
+                        $cartStockMessage = Mage::app()->getResponse()->getBody();
+                        if (!empty($cartStockMessage)) {
+                            Mage::getSingleton('checkout/session')->addNotice($cartStockMessage);
+                            Mage::app()->getResponse()->setBody('');
                         } else {
                             $message = $this->__('%s was successfully added to your shopping cart.', $product->getName());
                             Mage::getSingleton('checkout/session')->addSuccess($message);
                         }
                     }
+
                 }
+
+                //Cart Save needs to be the last
+                $cart->save();
+                Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+
+                //Check all cart and update out of stocks
+                foreach ($data as $row) {
+                    $productId = Mage::getModel('catalog/product')->getIdBySku($row['sku']);
+                    $product = Mage::getModel('catalog/product')
+                            ->setStoreId(Mage::app()->getStore()->getId())
+                            ->load($productId);
+
+                    Mage::dispatchEvent('checkout_cart_add_product_complete',
+                        array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
+                    );
+                }
+
             }
             catch (Mage_Core_Exception $e) {
                 if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
