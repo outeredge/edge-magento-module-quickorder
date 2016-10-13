@@ -83,8 +83,19 @@ class Edge_QuickOrder_IndexController extends Mage_Core_Controller_Front_Action
                             ->setStoreId(Mage::app()->getStore()->getId())
                             ->load($productId);
 
+                    $attributeName = [];
+                    if (!empty($row['super_attribute'])) {
+                        foreach ($row['super_attribute'] as $key => $superAtt) {
+                            $attributeName += [$key => $superAtt];
+                        }
+                    }
+
                     Mage::dispatchEvent('checkout_cart_add_product_complete',
-                        array('product' => $product, 'request' => $this->getRequest(), 'response' => $this->getResponse())
+                        array(
+                            'product' => $product,
+                            'request' => $this->getRequest(),
+                            'response' => $this->getResponse(),
+                            'attribute' => $attributeName)
                     );
                 }
 
